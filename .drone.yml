@@ -1,0 +1,42 @@
+---
+workspace:
+  base: /drone
+  path: src
+
+pipeline:
+  lint-shell:
+    image: koalaman/shellcheck-alpine:stable
+    group: lint
+    commands:
+      - apk add --no-cache bash
+      - bash ./.ci-scripts/lint-shell.sh
+
+  lint-yaml:
+    image: sdesbure/yamllint:latest
+    group: lint
+    commands:
+      - apk add --no-cache bash
+      - bash ./.ci-scripts/lint-yaml.sh
+
+  lint-dockerfile:
+    image: hadolint/hadolint:latest-debian
+    group: lint
+    commands:
+      - bash ./.ci-scripts/lint-dockerfile.sh
+
+  docker-build-and-push:
+    image: plugins/docker:17
+    secrets:
+      - docker_username
+      - docker_password
+    repo: sevoid/linter-pylint
+    tags:
+      - 'latest'
+    when:
+      branch:
+        - build-*
+
+branches:
+  axlude: [ master ]
+
+# vim:set syntax=yaml ts=2 sw=2 et:

@@ -5,31 +5,29 @@ workspace:
 
 pipeline:
   lint-shell:
-    image: koalaman/shellcheck-alpine:stable
+    image: sevoid/linter:latest
     group: lint
     commands:
-      - apk add --no-cache bash
-      - bash ./.ci-scripts/lint-shell.sh
+      - ./.ci/lint-shell.sh
 
   lint-yaml:
-    image: sdesbure/yamllint:latest
+    image: sevoid/linter:latest
     group: lint
     commands:
-      - apk add --no-cache bash
-      - bash ./.ci-scripts/lint-yaml.sh
+      - ./.ci/lint-yaml.sh
 
   lint-dockerfile:
-    image: hadolint/hadolint:latest-debian
+    image: sevoid/linter:latest
     group: lint
     commands:
-      - bash ./.ci-scripts/lint-dockerfile.sh
+      - ./.ci/lint-dockerfile.sh
 
   docker-build-and-push:
     image: plugins/docker:17
     secrets:
       - docker_username
       - docker_password
-    repo: sevoid/linter-pylint
+    repo: sevoid/linter
     tags:
       - 'latest'
     when:
@@ -37,6 +35,6 @@ pipeline:
         - build-*
 
 branches:
-  axlude: [ master ]
+  exclude: [ master ]
 
 # vim:set syntax=yaml ts=2 sw=2 et:

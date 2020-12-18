@@ -9,32 +9,71 @@ pipeline:
     group: lint
     commands:
       - ./.ci/lint-shell.sh
+    when:
+      event:
+        - push
+      branch:
+        exclude:
+          - master
+          - release-*
 
   lint-yaml:
     image: sevoid/linter:latest
     group: lint
     commands:
       - ./.ci/lint-yaml.sh
+    when:
+      event:
+        - push
+      branch:
+        exclude:
+          - master
+          - release-*
 
   lint-dockerfile:
     image: sevoid/linter:latest
     group: lint
     commands:
       - ./.ci/lint-dockerfile.sh
+    when:
+      event:
+        - push
+      branch:
+        exclude:
+          - master
+          - release-*
 
-  docker-build-and-push:
+  docker-dev:
     image: plugins/docker:17
     secrets:
       - docker_username
       - docker_password
     repo: sevoid/linter
     tags:
-      - 'latest'
+      - dev
+      - dev-${DRONE_COMMIT:0:7}
+    when:
+      event:
+        - push
+      branch:
+        - dev-*
+        - feature-*
+
+  docker-release:
+    image: plugins/docker:17
+    secrets:
+      - docker_username
+      - docker_password
+    repo: sevoid/linter
+    group: build
+    tags:
+      - latest
+      - ${DRONE_TAG}
     when:
       branch:
-        - build-*
-
-branches:
-  exclude: [ master ]
+        - master
+        - release-*
+      event:
+        - tag
 
 # vim:set syntax=yaml ts=2 sw=2 et:

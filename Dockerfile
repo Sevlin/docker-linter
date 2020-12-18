@@ -8,27 +8,31 @@ ENV HADOLINT_VER=1.19.0
 ENV PYLINT_VER=2.6.0
 
 COPY slackpkg.conf /etc/slackpkg/
+COPY sudoers /etc/sudoers
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 #
 # SYS: configuration and upgrades
 #
-RUN touch /var/lib/slackpkg/current \
+RUN chmod 440 /etc/sudoers \
+ && touch /var/lib/slackpkg/current \
  && slackpkg update \
  && slackpkg install perl ca-certificates dcron \
  && echo 'https://mirrors.nix.org.ua/linux/slackware/slackware64-current/' > /etc/slackpkg/mirrors \
  && slackpkg update gpg \
  && slackpkg update \
  && slackpkg upgrade-all \
- && slackpkg install python3 \
+ && slackpkg install sudo \
+                     python3 \
                      python-pip \
                      python-setuptools
 
 #
 # SYS: add user
 #
-RUN useradd -c 'User for code linters' -s /bin/bash linter
+RUN useradd -c 'User for code linters' -s /bin/bash linter \
+ && usermod -a -G wheel linter
 
 #
 # INST: pylint

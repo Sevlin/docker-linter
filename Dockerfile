@@ -2,10 +2,11 @@ FROM vbatts/slackware:current
 
 LABEL maintainer="sev@nix.org.ua"
 
-ENV SHELLCHECK_VER=0.7.1
-ENV YAMLLINT_VER=1.25.0
-ENV HADOLINT_VER=1.19.0
-ENV PYLINT_VER=2.6.0
+ENV SHELLCHECK_VER=0.7.1 \
+    YAMLLINT_VER=1.25.0 \
+    HADOLINT_VER=1.19.0 \
+    PYLINT_VER=2.6.0 \
+    ANSIBLE_LINT=4.3.7
 
 COPY slackpkg.conf /etc/slackpkg/
 COPY sudoers /etc/sudoers
@@ -26,12 +27,14 @@ RUN chmod 440 /etc/sudoers \
  && slackpkg install sudo \
                      python3 \
                      python-pip \
-                     python-setuptools
+                     python-setuptools \
+ && rm -rf /var/lib/slackpkg/* \
+           /var/cache/packages/*
 
 #
 # SYS: add user
 #
-RUN useradd -c 'User for code linters' -s /bin/bash linter \
+RUN useradd -c 'User for code linters' -m -s /bin/bash linter \
  && usermod -a -G wheel linter
 
 #
@@ -60,6 +63,11 @@ RUN wget --quiet --no-check-certificate --output-document /usr/local/bin/hadolin
         https://github.com/hadolint/hadolint/releases/download/v${HADOLINT_VER}/hadolint-Linux-x86_64
 
 #
+# INST: ansible-lint
+#
+RUN pip install --no-cache-dir -q "ansible-lint[community]"==${ANSIBLE_LINT}
+
+#
 # MISK: owner & permissions
 #
 RUN chown root:root /usr/local/bin/* \
@@ -67,3 +75,16 @@ RUN chown root:root /usr/local/bin/* \
 
 USER linter
 
+#
+# Check that linters can execute
+#
+RUN echo "=== VERSIONS ===" \
+ && for LINTER in shellcheck \
+                  yamllint \
+                  hadolint \
+                  pylint \
+                  ansible-lint; \
+    do \
+        ${LINTER} --version; \
+        echo ""; \
+    done

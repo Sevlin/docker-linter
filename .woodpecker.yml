@@ -75,5 +75,6 @@ pipeline:
         - release-*
       event:
         - tag
+        - push
 
 # vim:set syntax=yaml ts=2 sw=2 et:

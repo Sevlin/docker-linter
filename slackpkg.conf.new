@@ -1,13 +1,14 @@
 #
-# slackpkg.conf - Configuration for SlackPkg
-# v2.8
+# /etc/slackpkg/slackpkg.conf
+# Configuration for SlackPkg
+# v15.0
 #
 TEMP=/var/cache/packages
 WORKDIR=/var/lib/slackpkg
 WGETFLAGS="--passive-ftp --no-verbose --progress=dot:giga:noscroll --no-check-certificate"
 DELALL=yes
-CHECKMD5=off
-CHECKGPG=off
+CHECKMD5=on
+CHECKGPG=on
 CHECKSIZE=off
 PRIORITY=( patches %PKGMAIN extra pasture testing )
 POSTINST=on

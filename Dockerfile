@@ -17,11 +17,18 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 # SYS: configuration and upgrades
 #
 RUN chmod 440 /etc/sudoers \
+ && echo 'http://mirrors.nix.org.ua/linux/slackware/slackware64-current/' > /etc/slackpkg/mirrors \
  && touch /var/lib/slackpkg/current \
  && slackpkg update \
- && slackpkg install perl ca-certificates dcron \
- && echo 'https://mirrors.nix.org.ua/linux/slackware/slackware64-current/' > /etc/slackpkg/mirrors \
  && slackpkg update gpg \
+ && slackpkg install glibc aaa_libraries \
+                     perl ca-certificates \
+                     dcron slackpkg
+
+COPY slackpkg.conf.new /etc/slackpkg/slackpkg.conf
+RUN echo 'http://mirrors.nix.org.ua/linux/slackware/slackware64-current/' > /etc/slackpkg/mirrors \
+ && touch /var/lib/slackpkg/current \
+ && slackpkg new-config \
  && slackpkg update \
  && slackpkg upgrade-all \
  && slackpkg install sudo \

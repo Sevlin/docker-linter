@@ -9,30 +9,35 @@ ENV SHELLCHECK_VER=0.7.1 \
     ANSIBLE_LINT=4.3.7
 
 COPY slackpkg.conf /etc/slackpkg/
-COPY sudoers /etc/sudoers
+COPY sudoers /etc/sudoers.d/10-wheel
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 #
 # SYS: configuration and upgrades
 #
-RUN chmod 440 /etc/sudoers \
- && echo 'http://mirrors.nix.org.ua/linux/slackware/slackware64-current/' > /etc/slackpkg/mirrors \
+RUN echo 'http://mirrors.nix.org.ua/linux/slackware/slackware64-current/' > /etc/slackpkg/mirrors \
  && touch /var/lib/slackpkg/current \
  && slackpkg update \
  && slackpkg update gpg \
  && slackpkg install glibc aaa_libraries \
                      perl ca-certificates \
-                     dcron slackpkg
+                     dcron sudo acl attr \
+                     libcap elogind libpwquality \
+                     e2fsprogs cracklib \
+                     krb5 pam slackpkg \
+                     sysklogd libnsl libtirpc \
+ && rm -rf /var/lib/slackpkg/* \
+           /var/cache/packages/*
 
 COPY slackpkg.conf.new /etc/slackpkg/slackpkg.conf
+
 RUN echo 'http://mirrors.nix.org.ua/linux/slackware/slackware64-current/' > /etc/slackpkg/mirrors \
  && touch /var/lib/slackpkg/current \
  && slackpkg new-config \
  && slackpkg update \
  && slackpkg upgrade-all \
- && slackpkg install sudo \
-                     python3 \
+ && slackpkg install python3 \
                      python-pip \
                      python-setuptools \
  && rm -rf /var/lib/slackpkg/* \

@@ -4,7 +4,7 @@ LABEL maintainer="sev@nix.org.ua"
 
 ENV SHELLCHECK_VER=0.7.1 \
     YAMLLINT_VER=1.26.0 \
-    HADOLINT_VER=1.19.0 \
+    HADOLINT_VER=2.1.0 \
     PYLINT_VER=2.7.2 \
     ANSIBLE_LINT=4.3.7
 

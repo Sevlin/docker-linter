@@ -5,10 +5,22 @@ workspace:
 
 pipeline:
   lint-shell:
-    image: sevoid/linter:latest
+    image: sevoid/linter:dev
+    pull: true
     group: lint
-    commands:
-      - ./.ci/lint-shell.sh
+    lint: shell
+    debug: true
+    color: always
+    before_script: |
+      echo "This is inline script"
+      touch /tmp/foo
+      if [[ -f /tmp/foo ]]; then
+        echo "foo"
+      fi
+    path:
+      - ./scripts/
+    files:
+      - ./scripts/bin/lint-*
     when:
       event:
         - push
@@ -18,10 +30,19 @@ pipeline:
           - release-*
 
   lint-yaml:
-    image: sevoid/linter:latest
+    image: sevoid/linter:dev
+    pull: true
     group: lint
-    commands:
-      - ./.ci/lint-yaml.sh
+    lint: yaml
+    debug: true
+    before_script:
+      - echo "This is list script"
+      - touch /tmp/bar
+      - "[[ -f /tmp/bar ]] && echo bar"
+    files:
+      - ./.woodpecker.yml
+      - ./conf/yamllint.yml
+      - ./hadolint.yml
     when:
       event:
         - push
@@ -31,10 +52,11 @@ pipeline:
           - release-*
 
   lint-dockerfile:
-    image: sevoid/linter:latest
+    image: sevoid/linter:dev
+    pull: true
     group: lint
-    commands:
-      - ./.ci/lint-dockerfile.sh
+    lint: docker
+    debug: true
     when:
       event:
         - push
@@ -44,7 +66,9 @@ pipeline:
           - release-*
 
   docker-dev:
-    image: plugins/docker:17
+    image: plugins/docker:linux-amd64
+    experimental: true
+    squash: true
     secrets:
       - docker_username
       - docker_password
@@ -60,14 +84,16 @@ pipeline:
         - feature-*
 
   docker-release:
-    image: plugins/docker:17
+    image: plugins/docker:linux-amd64
+    experimental: true
+    squash: true
     secrets:
       - docker_username
       - docker_password
     repo: sevoid/linter
     group: build
     tags:
-      - latest
+      - plugin
       - ${DRONE_TAG}
     when:
       branch:

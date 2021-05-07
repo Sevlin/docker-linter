@@ -28,11 +28,13 @@ List of linters **to be installed**
 * [PHP-CS-Fixer](https://github.com/FriendsOfPHP/PHP-CS-Fixer)
 
 ## Linters & basic usage
-| Name           | Plug-in  | Description                                                                  | Link                                              |
-|:--------------:|:--------:|:----------------------------------------------------------------------------:|:--------------------------------------------------|
-| **shellcheck** | `shell`  | A shell script static analysis tool                                          | [GitHub](https://github.com/koalaman/shellcheck)  |
-| **yamllint**   | `yaml`   | A linter for YAML files                                                      | [GitHub](https://github.com/adrienverge/yamllint) |
-| **hadolint**   | `docker` | A smarter Dockerfile linter that helps you build best practice Docker images | [GitHub](https://github.com/hadolint/hadolint)    |
+| Name             | Plug-in  | Description                                                                                                                        | Link                                              |
+|:----------------:|:--------:|:----------------------------------------------------------------------------------------------------------------------------------:|:--------------------------------------------------|
+| **shellcheck**   | `shell`  | A shell script static analysis tool                                                                                                | [GitHub](https://github.com/koalaman/shellcheck)  |
+| **yamllint**     | `yaml`   | A linter for YAML files                                                                                                            | [GitHub](https://github.com/adrienverge/yamllint) |
+| **hadolint**     | `docker` | A smarter Dockerfile linter that helps you build best practice Docker images                                                       | [GitHub](https://github.com/hadolint/hadolint)    |
+| **phpcs**        | `php`    | **PHP_CodeSniffer**: `phpcs` script that tokenizes PHP, JavaScript and CSS files to detect violations of a defined coding standard | [GitHub](https://github.com/squizlabs/PHP_CodeSniffer)    |
+| **php-cs-fixer** | `php   ` | The **PHP Coding Standards Fixer** (**PHP CS Fixer**) tool fixes your code to follow standards; whether you want to follow PHP coding standards as defined in the PSR-1, PSR-2, etc., or other community driven ones like the Symfony one. You can also define your (team's) style through configuration. | [GitHub](https://github.com/FriendsOfPHP/PHP-CS-Fixer)    |
 #### Enabling linter
 <details>
   <summary><b>Shell</b> (click to expand)</summary>
@@ -67,6 +69,17 @@ pipeline:
 ```
 </details>
   
+<details>
+  <summary><b>PHP</b> (click to expand)</summary>
+  
+```diff
+pipeline:
+  lint:
+    image: sevoid/linter:plugin
++   lint: php
+```
+  
+</details>
 
 ## Examples
 #### Common pipeline options
@@ -219,7 +232,7 @@ disable=SC5678
 ### Pipeline options
 | Option       | Accepted values                                                            | Default value | Mandatory | Description                                                            |
 |:------------:|:---------------------------------------------------------------------------|:-------------:|:---------:|:-----------------------------------------------------------------------|
-| **lint**     | <ul><li>`sh`</li><li>`shell`</li><li>`bash`</li></ul>                      |               | **YES**   | Specifies type of linter to be used                                     |
+| **lint**     | <ul><li>`sh`</li><li>`shell`</li><li>`bash`</li></ul>                      |               | **YES**   | Specifies linter to be used                                            |
 | **color**    | <ul><li>`auto`</li><li>`always`</li></ul>                                  | `always`      | *NO*      | **Linter option**<br/>Enables/disables colourful output                |
 | **severity** | <ul><li>`error`</li><li>`warning`</li><li>`info`</li><li>`style`</li></ul> | `style`       | *NO*      | **Linter option**<br/>Specifies minimum severity of errors to consider |
 
@@ -249,7 +262,82 @@ rules:
 </details>
   
 ### Pipeline options
-| Option       | Accepted values                        | Default value | Mandatory | Description                         |
-|:------------:|:---------------------------------------|:-------------:|:---------:|:------------------------------------|
-| **lint**     | <ul><li>`yml`</li><li>`yaml`</li></ul> |               | **YES**   | Specifies type of linter to be used |
+| Option       | Accepted values                        | Default value | Mandatory | Description                 |
+|:------------:|:---------------------------------------|:-------------:|:---------:|:----------------------------|
+| **lint**     | <ul><li>`yml`</li><li>`yaml`</li></ul> |               | **YES**   | Specifies linter to be used |
 
+## PHP linter
+### Configuration file
+Default behaviour of `php-cs-fixer` can be overriden by placing `.php_cs` file into root directory of your git repo.  
+<details>
+  <summary>Example of <b>.php_cs</b> (click to expand)</summary>
+  
+```php
+<?php
+
+return PhpCsFixer\Config::create()
+    ->setRules([
+        '@Symphony' => true,
+        'strict_param' => true,
+        'array_syntax' => ['syntax' => 'short'],
+    ])
+    ->setUsingCache(false)
+    ->setFinder(
+      PhpCsFixer\Finder::create()
+        ->in(__DIR__)
+    );
+;
+```
+</details>
+  
+### Pipeline options
+| Option       | Accepted values                                                                                 | Default value | Mandatory | Description                 |
+|:------------:|:------------------------------------------------------------------------------------------------|:-------------:|:---------:|:----------------------------|
+| **lint**     | `php`                                                                                           |               | **YES**   | Specifies linter to be used |
+| **type**     | <ul><li>phpcs</li><li>php-cs-fix</li><li>php-cs-fixer</li><li>cs-fix</li><li>cs-fixer</li></ul> | `phpcs`       | *NO*      |
+<details>
+  <summary>Example of <b>phpcs</b> (click to expand)</summary>
+
+Plugin will use **phpcs** by default if `type` isn't specified.  
+
+```diff
+pipeline:
+  lint-php:
+    image: sevoid/linter:plugin
+    lint: php
+```
+```diff
+pipeline:
+  lint-php:
+    image: sevoid/linter:plugin
+    lint: php
++   type: phpcs
+```
+</details>
+  
+<details>
+  <summary>Example of <b>php-cs-fixer</b> (click to expand)</summary>
+
+```diff
+pipeline:
+  lint-php:
+    image: sevoid/linter:plugin
+    lint: php
++   type: cs-fix
+```
+```diff
+pipeline:
+  lint-php:
+    image: sevoid/linter:plugin
+    lint: php
++   type: cs-fixer
+```
+```diff
+pipeline:
+  lint-php:
+    image: sevoid/linter:plugin
+    lint: php
++   type: php-cs-fixer
+```
+</details>
+  

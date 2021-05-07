@@ -20,6 +20,18 @@
 # WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF
 # OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+PLUGIN_TYPE=${PLUGIN_TYPE:-phpcs}
+_LINTER=${_LINTER:-phpcs}
+
+case "${PLUGIN_TYPE}" in
+    php-cs-fix|php-cs-fixer|cs-fix|cs-fixer)
+        _LINTER=php-cs-fixer
+    ;;
+    *)
+        :
+    ;;
+esac
+
 #
 # Include common library
 #
@@ -31,43 +43,39 @@ else
     exit 1
 fi
 
-#
-# Build list of files
-#
-DIRS_TO_FILES='yes'
-
-#
-# Default values
-#
-PLUGIN_COLOR=${PLUGIN_COLOR:-"auto"}
-PLUGIN_SEVERITY=${PLUGIN_SEVERITY:-"style"}
-
-#
-# Ignore shell-check codes
-#
-if [[ -n ${PLUGIN_IGNORE} ]]; then
-    for _ign in ${PLUGIN_IGNORE[*]}; do
-        if [[ ${_ign} =~ ^SC[[:digit:]]+ ]]; then
-            EXTRA_ARGS="${EXTRA_ARGS} --exclude=${_ign}"
-        fi
-    done
-fi
-
 before_script
 build_file_list
+
+_lint_php()
+{
+    if [[ ${_LINTER} == php-cs-fixer ]];
+        # We need globing and word splitting
+        # shellcheck disable=SC2068
+        php-cs-fixer fix --dry-run --diff ${EXTRA_ARGS[@]} ${@}
+    else
+        # We need globing and word splitting
+        # shellcheck disable=SC2068
+        phpcs -s --colors ${EXTRA_ARGS[@]} ${@}
+    fi
+
+    return ${?}
+}
 
 #
 # Check files
 #
-while read -r _sh_file; do
-    # We need globing and word splitting
-    # shellcheck disable=SC2068
-    shellcheck ${EXTRA_ARGS[@]} \
-               --color="${PLUGIN_COLOR}" \
-               --severity="${PLUGIN_SEVERITY}" \
-               "${_sh_file}" \
+while read -r _php_file; do
+    _lint_php "${_php_file}" \
     || RET=${?}
 done < "${_CHECK_FILES}"
+
+#
+# Check dirs
+#
+while read -r _php_dir; do
+    _lint_php "${_php_dir}" \
+    || RET=${?}
+done < "${_SEARCH_DIRS}"
 
 exit ${RET}
 

@@ -54,5 +54,13 @@ while read -r _yaml_file; do
     || RET=${?}
 done < "${_CHECK_FILES}"
 
+#
+# Check dirs
+#
+while read -r _yaml_dir; do
+    yamllint "${_yaml_dir}" \
+    || RET=${?}
+done < "${_SEARCH_DIRS}"
+
 exit ${RET}
 

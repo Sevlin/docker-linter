@@ -42,6 +42,11 @@ if [[ -n ${PLUGIN_IGNORE} ]]; then
     done
 fi
 
+#
+# Build list of files
+#
+DIRS_TO_FILES='yes'
+
 before_script
 build_file_list
 

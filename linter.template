@@ -19,3 +19,7 @@ libtirpc
 python3
 python-pip
 python-setuptools
+libxml2
+libedit
+libsodium
+php

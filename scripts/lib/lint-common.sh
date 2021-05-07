@@ -48,6 +48,12 @@ if [[ -n ${PLUGIN_ERREXIT} ]]; then
     set -o errexit
 fi
 
+#
+# Some of linters doesn't scan directories, hence
+# we need to provide them list of files to check
+#
+DIRS_TO_FILES=${DIRS_TO_FILES:-no}
+
 DEF_IFS="${IFS}"
 export IFS=','
 
@@ -112,7 +118,7 @@ _dir_list()
         if [[ -d ${_d} ]]; then
             readlink -f "${_d}" >> "${_DIRS_UNSORTED}"
         else
-            echo "Path ${_d} does not exist!" 1>&2
+            echo ">>> Directory ${_d} does not exist!" 1>&2
             RET=1
         fi
     done
@@ -155,6 +161,15 @@ _find_docker()
     done < "${_SEARCH_DIRS}"
 }
 
+_find_php()
+{
+    while read -r _d; do
+        find "${_d}" -type f -name '*.php' \
+            >> "${_FILES_UNSORTED}"
+    done < "${_SEARCH_DIRS}"
+}
+
+
 _file_list()
 {
     #
@@ -164,38 +179,40 @@ _file_list()
         if [[ -f ${_f} ]]; then
             readlink -f "${_f}" >> "${_FILES_UNSORTED}"
         else
-            echo "File ${_f} can't be checked!" 1>&2
+            echo ">>> File ${_f} can't be checked!" 1>&2
         fi
     done
 
     #
-    # Find
+    # Search dirs for files (DIRS_TO_FILES)
     #
-    case "${PLUGIN_LINT,,}" in
-        shell|bash|sh)
-            _find_shell
-        ;;
-        yml|yaml)
-            _find_yaml
-        ;;
-        docker|dockerfile)
-            _find_docker
-        ;;
-        *)
-            :
-        ;;
-    esac
+    [[ ${DIRS_TO_FILES} == yes ]] \
+    && case "${PLUGIN_LINT,,}" in
+           shell|bash|sh)
+               _find_shell
+           ;;
+           yml|yaml)
+               _find_yaml
+           ;;
+           docker|dockerfile)
+               _find_docker
+           ;;
+           php)
+               _find_php
+           ;;
+           *)
+               :
+           ;;
+       esac
 
     #
     # Remove duplicates and count files
     #
-    echo -n "Files to check: "
     # shellcheck disable=SC2002
     cat "${_FILES_UNSORTED}" \
     | sort -n \
     | uniq \
-    | tee "${_CHECK_FILES}" \
-    | wc -l
+    > "${_CHECK_FILES}"
 }
 
 build_file_list()

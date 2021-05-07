@@ -21,6 +21,9 @@ elif [[ -n ${PLUGIN_LINT} ]]; then
         docker|dockerfile)
             lint-dockerfile
         ;;
+        php)
+            lint-php
+        ;;
         *)
             echo "Unknown linter: ${PLUGIN_LINT}" 2>&1
             exit 1

@@ -1,4 +1,8 @@
 ---
+clone:
+  git:
+    image: plugins/git:next
+
 workspace:
   base: /drone
   path: src

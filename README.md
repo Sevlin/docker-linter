@@ -2,6 +2,7 @@
 
 Drone/Woodpecker CI "plugin"  
 
+
 ```yaml
 pipeline:
   lint:
@@ -24,9 +25,25 @@ pipeline:
       - check.sh
 ```
 ---
-List of linters **to be installed**
-* [PHP-CS-Fixer](https://github.com/FriendsOfPHP/PHP-CS-Fixer)
-
+## Table of contents
+* [Linters & basic usage](#user-content-linters-basic-usage)
+    - [Enabling linter](#enabling-linter)
+* [Examples](#examples)
+    - [Common pipeline options](#common-pipeline-options)
+* [Shell linter](#shell-linter)
+  + [Configuration file](#configuration-file)
+  + [Pipeline options](#pipeline-options)
+* [YAML linter](#yaml-linter)
+  + [Configuration file](#configuration-file-1)
+  + [Pipeline options](#pipeline-options-1)
+* [Dockerfile linter](#dockerfile-linter)
+  + [Configuration file](#configuration-file-2)
+  + [Pipeline options](#pipeline-options-2)
+* [PHP linter](#php-linter)
+  + [Configuration file](#configuration-file-3)
+  + [Pipeline options](#pipeline-options-3)
+  
+---
 ## Linters & basic usage
 | Name             | Plug-in  | Description                                                                                                                        | Link                                              |
 |:----------------:|:--------:|:----------------------------------------------------------------------------------------------------------------------------------:|:--------------------------------------------------|
@@ -266,6 +283,32 @@ rules:
 |:------------:|:---------------------------------------|:-------------:|:---------:|:----------------------------|
 | **lint**     | <ul><li>`yml`</li><li>`yaml`</li></ul> |               | **YES**   | Specifies linter to be used |
 
+## Dockerfile linter
+### Configuration file
+Default behaviour of `hadolint` can be overriden by placing `.hadolint.yaml` file into root directory of your git repo.  
+<details>
+  <summary>Example of <b>.hadolint.yaml</b> (click to expand)</summary>
+  
+```yaml
+override:
+  error:
+    - DL3001
+    - DL3002
+  warning:
+    - DL3042
+    - DL3033
+  info:
+    - DL3032
+  style:
+    - DL3015
+```
+</details>
+  
+### Pipeline options
+| Option   | Accepted values                                 | Default value | Mandatory | Description                 |
+|:--------:|:------------------------------------------------|:-------------:|:---------:|:----------------------------|
+| **lint** | <ul><li>`docker`</li><li>`dockerfile`</li></ul> |               | **YES**   | Specifies linter to be used |
+
 ## PHP linter
 ### Configuration file
 Default behaviour of `php-cs-fixer` can be overriden by placing `.php_cs` file into root directory of your git repo.  
@@ -277,7 +320,7 @@ Default behaviour of `php-cs-fixer` can be overriden by placing `.php_cs` file i
 
 return PhpCsFixer\Config::create()
     ->setRules([
-        '@Symphony' => true,
+        '@Symfony' => true,
         'strict_param' => true,
         'array_syntax' => ['syntax' => 'short'],
     ])

@@ -51,7 +51,7 @@ _lint_php()
     if [[ ${_LINTER} == php-cs-fixer ]]; then
         # We need globing and word splitting
         # shellcheck disable=SC2068
-        php-cs-fixer fix --dry-run --diff ${EXTRA_ARGS[@]} ${@}
+        php-cs-fixer fix --ansi --dry-run --diff ${EXTRA_ARGS[@]} ${@}
     else
         # We need globing and word splitting
         # shellcheck disable=SC2068

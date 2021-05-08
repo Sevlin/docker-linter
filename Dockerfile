@@ -114,6 +114,7 @@ RUN chown -v root:root /usr/local/bin/*
 RUN chmod -v 0755 /usr/local/bin/*
 
 USER linter
+WORKDIR /home/linter
 
 #
 # Check that linters can execute

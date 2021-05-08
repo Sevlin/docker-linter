@@ -118,7 +118,7 @@ pipeline:
     tags:
       - latest
       - plugin
-      - ${DRONE_TAG}
+      - ${DRONE_TAG##v}
     when:
       event:
         - push

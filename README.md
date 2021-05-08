@@ -312,24 +312,23 @@ override:
 
 ## PHP linter
 ### Configuration file
-Default behaviour of `php-cs-fixer` can be overriden by placing `.php_cs` file into root directory of your git repo.  
+Default behaviour of `php-cs-fixer` can be overriden by placing `.php-cs-fixer.php` file into root directory of your git repo.  
 <details>
-  <summary>Example of <b>.php_cs</b> (click to expand)</summary>
+  <summary>Example of <b>.php-cs-fixer.php</b> (click to expand)</summary>
   
 ```php
 <?php
 
-return PhpCsFixer\Config::create()
-    ->setRules([
+$finder = PhpCsFixer\Finder::create()
+    ->in(__DIR__)
+;
+
+$config = new PhpCsFixer\Config();
+return $config->setRules([
         '@Symfony' => true,
-        'strict_param' => true,
-        'array_syntax' => ['syntax' => 'short'],
+        'full_opening_tag' => false,
     ])
-    ->setUsingCache(false)
-    ->setFinder(
-      PhpCsFixer\Finder::create()
-        ->in(__DIR__)
-    );
+    ->setFinder($finder)
 ;
 ```
 </details>

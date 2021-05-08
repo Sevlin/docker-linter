@@ -121,11 +121,8 @@ pipeline:
       - ${DRONE_TAG}
     when:
       event:
-        - tag
         - push
       branch:
-        - master
-        - release-*
         - refs/tags/v*
 
 # vim:set syntax=yaml ts=2 sw=2 et:

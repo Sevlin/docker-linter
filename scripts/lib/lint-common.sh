@@ -83,6 +83,7 @@ before_script()
 #!/usr/bin/env bash
 set -o errexit
 set -o pipefail
+set -o xtrace
 
 EOF
         # shellcheck disable=SC2068
@@ -102,7 +103,7 @@ EOF
 
         echo "=== BEFORE SCRIPT ==="
         echo
-        IFS="${DEF_IFS}" exec bash "${_BEFORE_SCRIPT}"
+        IFS="${DEF_IFS}" bash "${_BEFORE_SCRIPT}" || exit 1
         echo
         echo "====================="
         echo

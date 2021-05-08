@@ -33,7 +33,9 @@ fi
 
 #
 # Build list of files
+# (lint-common.sh)
 #
+# shellcheck disable=SC2034
 DIRS_TO_FILES='yes'
 
 #

@@ -39,6 +39,7 @@ pipeline:
     group: lint
     lint: yaml
     debug: true
+    color: always
     before_script:
       - echo "This is list script"
       - touch /tmp/bar
@@ -46,7 +47,7 @@ pipeline:
     files:
       - ./.woodpecker.yml
       - ./conf/yamllint.yml
-      - ./hadolint.yml
+      - ./.hadolint.yaml
     when:
       event:
         - push
@@ -105,6 +106,5 @@ pipeline:
         - release-*
       event:
         - tag
-        - push
 
 # vim:set syntax=yaml ts=2 sw=2 et:

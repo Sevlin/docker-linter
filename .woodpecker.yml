@@ -1,13 +1,23 @@
 ---
 clone:
   git:
-    image: plugins/git:next
+    image: drone/git
 
 workspace:
   base: /drone
   path: src
 
 pipeline:
+  env:
+    image: alpine
+    commands:
+      - env | sort -n
+    when:
+      branch:
+        exclude:
+          - master
+          - release-*
+
   lint-shell:
     image: sevoid/linter:dev
     pull: true
@@ -70,7 +80,7 @@ pipeline:
           - master
           - release-*
 
-  docker-dev:
+  build-dev:
     image: plugins/docker:linux-amd64
     experimental: true
     squash: true
@@ -85,10 +95,11 @@ pipeline:
       event:
         - push
       branch:
-        - dev-*
-        - feature-*
+        exclude:
+          - master
+          - release-*
 
-  docker-release:
+  build-release:
     image: plugins/docker:linux-amd64
     experimental: true
     squash: true
@@ -98,13 +109,14 @@ pipeline:
     repo: sevoid/linter
     group: build
     tags:
+      - latest
       - plugin
       - ${DRONE_TAG}
     when:
+      event:
+        - tag
       branch:
         - master
         - release-*
-      event:
-        - tag
 
 # vim:set syntax=yaml ts=2 sw=2 et:

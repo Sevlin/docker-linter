@@ -2,6 +2,7 @@
 
 Drone/Woodpecker CI "plugin"  
 
+[![Build status](https://build.nix.org.ua/api/badges/NiX/docker-linter/status.svg)](https://build.nix.org.ua/NiX/docker-linter/) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ```yaml
 pipeline:

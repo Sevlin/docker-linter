@@ -13,10 +13,13 @@ pipeline:
     commands:
       - env | sort -n
     when:
+      event:
+        - push
       branch:
         exclude:
           - master
           - release-*
+          - refs/tags/v*
 
   lint-shell:
     image: sevoid/linter:dev
@@ -42,6 +45,7 @@ pipeline:
         exclude:
           - master
           - release-*
+          - refs/tags/v*
 
   lint-yaml:
     image: sevoid/linter:dev
@@ -65,6 +69,7 @@ pipeline:
         exclude:
           - master
           - release-*
+          - refs/tags/v*
 
   lint-dockerfile:
     image: sevoid/linter:dev
@@ -79,6 +84,7 @@ pipeline:
         exclude:
           - master
           - release-*
+          - refs/tags/v*
 
   build-dev:
     image: plugins/docker:linux-amd64
@@ -98,6 +104,7 @@ pipeline:
         exclude:
           - master
           - release-*
+          - refs/tags/v*
 
   build-release:
     image: plugins/docker:linux-amd64
@@ -115,8 +122,10 @@ pipeline:
     when:
       event:
         - tag
+        - push
       branch:
         - master
         - release-*
+        - refs/tags/v*
 
 # vim:set syntax=yaml ts=2 sw=2 et:

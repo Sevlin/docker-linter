@@ -1,4 +1,4 @@
-FROM vbatts/slackware:current
+FROM sevoid/slackware:current
 
 LABEL maintainer="sev@nix.org.ua"
 
@@ -12,43 +12,16 @@ ENV PHPCS_VER=3.6.0
 ENV PYLINT_VER=2.7.2
 ENV ANSIBLE_LINT=4.3.7
 
-# pkgtools flags
-ENV TERSE=0
-# upgradepkg flag
-#   Workaround to install new slackpkg,
-#   even though older version is installed
-ENV INSTALL_NEW=yes
-
-COPY slackpkg.conf /etc/slackpkg/
-COPY linter.template /etc/slackpkg/templates/
-COPY sudoers /etc/sudoers.d/10-wheel
-
-RUN mkdir -p /usr/local/etc
-
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
-#
-# SYS: configuration and upgrades
-#
-RUN echo 'http://mirrors.nix.org.ua/linux/slackware/slackware64-current/' > /etc/slackpkg/mirrors
-RUN touch /var/lib/slackpkg/current
-RUN slackpkg update
-RUN slackpkg update gpg
-RUN slackpkg install glibc-2 pkgtools
-RUN slackpkg install-template linter
-RUN update-ca-certificates --fresh
+COPY linter.template /etc/slackpkg/templates/
 
-RUN slackpkg upgrade slackpkg
-COPY slackpkg.conf /etc/slackpkg/
-RUN sed -i 's/v2.8/v15.0/g' /etc/slackpkg/slackpkg.conf
-RUN echo 'https://mirrors.nix.org.ua/linux/slackware/slackware64-current/' > /etc/slackpkg/mirrors
-RUN touch /var/lib/slackpkg/current
-RUN rm -vf /var/lib/pkgtools/packages/slackpkg-2.8*
+RUN slackpkg update gpg
 RUN slackpkg update
 RUN slackpkg upgrade-all
-RUN rm -rf /var/lib/slackpkg/* \
-           /var/cache/packages/*
-RUN touch /var/lib/slackpkg/current
+RUN slackpkg install-template linter
+
+RUN mkdir -p /usr/local/etc
 
 COPY ./scripts/entrypoint.sh /usr/local/sbin/
 COPY ./scripts/lib/lint-common.sh /usr/local/share/lint/
@@ -119,20 +92,18 @@ WORKDIR /home/linter
 #
 # Check that linters can execute
 #
-RUN echo "=== VERSIONS ==="
-RUN shellcheck --version \
+RUN echo "=== VERSIONS ===" \
+ && shellcheck --version \
+ && echo \
+ && yamllint --version \
+ && echo \
+ && hadolint --version \
+ && echo \
+ && php-cs-fixer --version \
+ && echo \
+ && phpcs --version \
+ && echo \
+ && pylint --version \
  && echo
-RUN yamllint --version \
- && echo
-RUN hadolint --version \
- && echo
-RUN php-cs-fixer --version \
- && echo
-RUN phpcs --version \
- && echo
-RUN pylint --version \
- && echo
-#RUN ansible-lint --version \
-# && echo
 
 ENTRYPOINT ["/usr/local/sbin/entrypoint.sh"]

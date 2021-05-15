@@ -136,6 +136,6 @@ pipeline:
       event:
         - push
       branch:
-        - current
+        - master
 
 # vim:set syntax=yaml ts=2 sw=2 et:

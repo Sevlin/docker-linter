@@ -82,47 +82,47 @@ pipeline:
           - release-*
           - refs/tags/v*
 
-  build-dev:
-    image: plugins/docker:linux-amd64
-    experimental: true
-    squash: true
-    purge: true
-    no_cache: true
-    secrets:
-      - docker_username
-      - docker_password
-    repo: sevoid/linter
-    tags:
-      - dev
-    when:
-      event:
-        - push
-      branch:
-        exclude:
-          - master
-          - release-*
-          - refs/tags/v*
+# build-dev:
+#   image: plugins/docker:linux-amd64
+#   experimental: true
+#   squash: true
+#   purge: true
+#   no_cache: true
+#   secrets:
+#     - docker_username
+#     - docker_password
+#   repo: sevoid/linter
+#   tags:
+#     - dev
+#   when:
+#     event:
+#       - push
+#     branch:
+#       exclude:
+#         - master
+#         - release-*
+#         - refs/tags/v*
 
-  build-release:
-    image: plugins/docker:linux-amd64
-    experimental: true
-    squash: true
-    purge: true
-    no_cache: true
-    secrets:
-      - docker_username
-      - docker_password
-    repo: sevoid/linter
-    group: build
-    tags:
-      - latest
-      - plugin
-      - ${DRONE_TAG##v}
-    when:
-      event:
-        - push
-      branch:
-        - refs/tags/v*
+# build-release:
+#    image: plugins/docker:linux-amd64
+#    experimental: true
+#    squash: true
+#    purge: true
+#    no_cache: true
+#    secrets:
+#      - docker_username
+#      - docker_password
+#    repo: sevoid/linter
+#    group: build
+#    tags:
+#      - latest
+#      - plugin
+#      - ${DRONE_TAG##v}
+#    when:
+#      event:
+#        - push
+#      branch:
+#        - refs/tags/v*
 
   mirror-to-github:
     image: appleboy/drone-git-push
